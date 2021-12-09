@@ -333,9 +333,10 @@ int main(int argc, char** argv){
         double tempamb = ((tempsensor*coeff)*125)/5;
         
        
+        
         sprintf(ligne1, "temp : %.1f C    ", tempamb);
         
-        sprintf(ligne2, "Time %02d   ",time.month);
+        sprintf(ligne2, "date:%02d/%02d/%02d   ",time.day,time.month,time.year);
         
         
         sendCommand(0x80);

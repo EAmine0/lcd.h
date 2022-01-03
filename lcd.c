@@ -23,9 +23,9 @@
 #define LCD_EN PORTDbits.RD4
 #define LCD_RS PORTBbits.RB15
 
+//-------RTCC DATE&Time
 
 static RTCC_DATETIME time;
-
 static uint8_t RTCC_DecToBCD (uint8_t value);
 static uint8_t RTCC_BCDToDec (uint8_t value);
 
@@ -243,6 +243,7 @@ void inline __attribute__((deprecated)) BSP_RTCC_TimeGet (BSP_RTCC_DATETIME * va
     RTCC_TimeGet(value);
 }
 
+//---------------------
 
 void delay(){
     unsigned int i;
@@ -279,9 +280,7 @@ char ligne2[16];
 
 int main(int argc, char** argv){
     
-    time.bcdFormat = false;
-    RTCC_BuildTimeGet( &time );
-    RTCC_Initialize( &time );
+    
 
     unsigned char i, s;
     TRISE = 0x00;
@@ -314,29 +313,27 @@ int main(int argc, char** argv){
     AD1CHSbits.CH0SA = 4;
     AD1CON1bits.ADON = 1; 
     
+    
     sendCommand(0x38);
     sendCommand(0x0E);
     sendCommand(0x01);
     
     while(1){
         
+        time.bcdFormat = false;
+        RTCC_BuildTimeGet( &time );
+        RTCC_Initialize( &time );
         RTCC_TimeGet( &time );
-        
-        printf( "Time %02d:%02d:%02d   Pot = %4d\r\n", 
-                time.hour, 
-                time.minute, 
-                time.second
-              );
         
         tempsensor = ADC1BUF0;
         double coeff = 0.004882;
         double tempamb = ((tempsensor*coeff)*125)/5;
         
-       
+        sprintf(ligne1, "temp: %.1f C    ", tempamb);
         
-        sprintf(ligne1, "temp : %.1f C    ", tempamb);
         
-        sprintf(ligne2, "date:%02d/%02d/%02d   ",time.day,time.month,time.year);
+        
+        sprintf(ligne2, "time:%02d/%02d %02d:%02d",time.day,time.month,time.hour,time.minute);
         
         
         sendCommand(0x80);
@@ -345,7 +342,7 @@ int main(int argc, char** argv){
             sendData(s);
         }
         delay();
-        
+        ////
         //sprintf(ligne2, "time : ");
         sendCommand(0xc0);
         for(i=0;i<16;i++){
@@ -353,8 +350,9 @@ int main(int argc, char** argv){
             sendData(s);
         }
         delay();
-        
+           
         
     }
     return (EXIT_SUCCESS);
 }
+ 
